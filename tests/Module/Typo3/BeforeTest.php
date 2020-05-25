@@ -21,13 +21,13 @@ use Composer\Semver\Comparator;
 use Composer\Semver\VersionParser;
 use PackageVersions\Versions;
 use Portrino\Codeception\Exception\MethodNotSupportedException;
-use Portrino\Codeception\Factory\ProcessBuilderFactory;
+use Portrino\Codeception\Factory\ProcessFactory;
 use Portrino\Codeception\Interfaces\Commands\Typo3Command;
 use Portrino\Codeception\Module\Typo3;
 use Portrino\Codeception\Tests\Module\Typo3Test;
 use Prophecy\Argument;
 use Symfony\Component\Process\Process;
-use Symfony\Component\Process\ProcessBuilder;
+use Symfony\Component\Process\Process;
 
 /**
  * Class BeforeTest
@@ -60,11 +60,11 @@ class BeforeTest extends Typo3Test
         if (self::$isMethodSupported) {
             $this->container = $this->prophesize(ModuleContainer::class);
             $this->process = $this->prophesize(Process::class);
-            $this->processBuilderFactory = $this->prophesize(ProcessBuilderFactory::class);
-            $this->builder = $this->prophesize(ProcessBuilder::class);
+            $this->ProcessFactory = $this->prophesize(ProcessFactory::class);
+            $this->builder = $this->prophesize(Process::class);
             $this->asserts = $this->prophesize(Asserts::class);
 
-            $tmpBuilder = new ProcessBuilder();
+            $tmpBuilder = new Process();
             $cmd = $tmpBuilder
                 ->setPrefix(self::$typo3cmsPath)
                 ->add(Typo3Command::DATABASE_IMPORT)
@@ -84,7 +84,7 @@ class BeforeTest extends Typo3Test
             $this->process->isSuccessful()->willReturn(true);
             $this->process->getOutput()->willReturn(self::DEBUG_SUCCESS);
 
-            $this->processBuilderFactory->getBuilder()->willReturn($this->builder);
+            $this->ProcessFactory->getBuilder()->willReturn($this->builder);
 
             $this->typo3 = new Typo3(
                 $this->container->reveal(),
@@ -93,7 +93,7 @@ class BeforeTest extends Typo3Test
                     'data-dir' => __DIR__ . '/../../Fixture/data/'
                 ]
             );
-            $this->typo3->setProcessBuilderFactory($this->processBuilderFactory->reveal());
+            $this->typo3->setProcessFactory($this->ProcessFactory->reveal());
             $this->typo3->_inject($this->asserts->reveal());
         }
 

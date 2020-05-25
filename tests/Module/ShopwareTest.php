@@ -17,11 +17,11 @@ namespace Portrino\Codeception\Tests\Module;
 use Codeception\Lib\ModuleContainer;
 use Codeception\Module\Asserts;
 use PHPUnit\Framework\TestCase;
-use Portrino\Codeception\Factory\ProcessBuilderFactory;
+use Portrino\Codeception\Factory\ProcessFactory;
 use Portrino\Codeception\Module\Shopware;
 use Prophecy\Prophecy\ObjectProphecy;
 use Symfony\Component\Process\Process;
-use Symfony\Component\Process\ProcessBuilder;
+use Symfony\Component\Process\Process;
 
 /**
  * Class ShopwareTest
@@ -45,7 +45,7 @@ abstract class ShopwareTest extends TestCase
     protected $shopware;
 
     /**
-     * @var ProcessBuilder|ObjectProphecy
+     * @var Process|ObjectProphecy
      */
     protected $builder;
 
@@ -60,9 +60,9 @@ abstract class ShopwareTest extends TestCase
     protected $process;
 
     /**
-     * @var ProcessBuilderFactory|ObjectProphecy
+     * @var ProcessFactory|ObjectProphecy
      */
-    protected $processBuilderFactory;
+    protected $ProcessFactory;
 
     /**
      * @var Asserts|ObjectProphecy

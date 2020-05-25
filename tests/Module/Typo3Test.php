@@ -19,12 +19,12 @@ use Codeception\Lib\ModuleContainer;
 use Codeception\Module\Asserts;
 use PHPUnit\Framework\TestCase;
 use PHPUnit_Framework_MockObject_MockObject;
-use Portrino\Codeception\Factory\ProcessBuilderFactory;
+use Portrino\Codeception\Factory\ProcessFactory;
 use Portrino\Codeception\Interfaces\Commands\Typo3Command;
 use Portrino\Codeception\Module\Typo3;
 use Prophecy\Prophecy\ObjectProphecy;
 use Symfony\Component\Process\Process;
-use Symfony\Component\Process\ProcessBuilder;
+use Symfony\Component\Process\Process;
 
 /**
  * Class Typo3Test
@@ -48,7 +48,7 @@ abstract class Typo3Test extends TestCase
     protected $typo3;
 
     /**
-     * @var ProcessBuilder|ObjectProphecy
+     * @var Process|ObjectProphecy
      */
     protected $builder;
 
@@ -63,9 +63,9 @@ abstract class Typo3Test extends TestCase
     protected $process;
 
     /**
-     * @var ProcessBuilderFactory|ObjectProphecy
+     * @var ProcessFactory|ObjectProphecy
      */
-    protected $processBuilderFactory;
+    protected $ProcessFactory;
 
     /**
      * @var Asserts|ObjectProphecy

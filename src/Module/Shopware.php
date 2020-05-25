@@ -20,7 +20,7 @@ use Codeception\Module\Asserts;
 use Portrino\Codeception\Interfaces\Commands\ShopwareCommand;
 use Portrino\Codeception\Module\Interfaces\CommandExecutorInterface;
 use Portrino\Codeception\Module\Traits\CommandExecutorTrait;
-use Portrino\Codeception\Factory\ProcessBuilderFactory;
+use Portrino\Codeception\Factory\ProcessFactory;
 
 /**
  * Class Shopware
@@ -61,7 +61,7 @@ class Shopware extends Module implements DependsOnModule, CommandExecutorInterfa
         parent::__construct($moduleContainer, $config);
         $this->processTimeout = (int)$this->config['process-timeout'];
         $this->processIdleTimeout = (int)$this->config['process-idle-timeout'];
-        $this->processBuilderFactory = new ProcessBuilderFactory();
+        $this->ProcessFactory = new ProcessFactory();
     }
 
     /**

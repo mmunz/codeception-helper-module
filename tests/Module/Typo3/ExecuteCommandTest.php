@@ -16,12 +16,12 @@ namespace Portrino\Codeception\Tests\Module\Typo3;
 
 use Codeception\Lib\ModuleContainer;
 use Codeception\Module\Asserts;
-use Portrino\Codeception\Factory\ProcessBuilderFactory;
+use Portrino\Codeception\Factory\ProcessFactory;
 use Portrino\Codeception\Interfaces\Commands\Typo3Command;
 use Portrino\Codeception\Module\Typo3;
 use Portrino\Codeception\Tests\Module\Typo3Test;
 use Symfony\Component\Process\Process;
-use Symfony\Component\Process\ProcessBuilder;
+use Symfony\Component\Process\Process;
 
 /**
  * Class ExecuteCommandTest
@@ -36,11 +36,11 @@ class ExecuteCommandTest extends Typo3Test
 
         $this->container = $this->prophesize(ModuleContainer::class);
         $this->process = $this->prophesize(Process::class);
-        $this->processBuilderFactory = $this->prophesize(ProcessBuilderFactory::class);
-        $this->builder = $this->prophesize(ProcessBuilder::class);
+        $this->ProcessFactory = $this->prophesize(ProcessFactory::class);
+        $this->builder = $this->prophesize(Process::class);
         $this->asserts = $this->prophesize(Asserts::class);
 
-        $tmpBuilder = new ProcessBuilder();
+        $tmpBuilder = new Process();
         $cmd = $tmpBuilder
             ->setPrefix(self::$typo3cmsPath)
             ->setArguments(
@@ -60,7 +60,7 @@ class ExecuteCommandTest extends Typo3Test
         $this->builder->setArguments([Typo3Command::DATABASE_UPDATE_SCHEMA])->shouldBeCalled();
         $this->builder->getProcess()->willReturn($this->process);
 
-        $this->processBuilderFactory->getBuilder()->willReturn($this->builder);
+        $this->ProcessFactory->getBuilder()->willReturn($this->builder);
     }
 
 
@@ -74,7 +74,7 @@ class ExecuteCommandTest extends Typo3Test
         $this->asserts->assertTrue(true)->shouldBeCalled();
 
         $this->typo3 = new Typo3($this->container->reveal());
-        $this->typo3->setProcessBuilderFactory($this->processBuilderFactory->reveal());
+        $this->typo3->setProcessFactory($this->ProcessFactory->reveal());
         $this->typo3->_inject($this->asserts->reveal());
 
         $this->typo3->executeCommand(Typo3Command::DATABASE_UPDATE_SCHEMA);
@@ -90,7 +90,7 @@ class ExecuteCommandTest extends Typo3Test
         $this->asserts->assertTrue(false)->shouldBeCalled();
 
         $this->typo3 = new Typo3($this->container->reveal());
-        $this->typo3->setProcessBuilderFactory($this->processBuilderFactory->reveal());
+        $this->typo3->setProcessFactory($this->ProcessFactory->reveal());
         $this->typo3->_inject($this->asserts->reveal());
 
         $this->typo3->executeCommand(Typo3Command::DATABASE_UPDATE_SCHEMA);

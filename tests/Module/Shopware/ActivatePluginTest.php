@@ -16,12 +16,12 @@ namespace Portrino\Codeception\Tests\Module\Shopware;
 
 use Codeception\Lib\ModuleContainer;
 use Codeception\Module\Asserts;
-use Portrino\Codeception\Factory\ProcessBuilderFactory;
+use Portrino\Codeception\Factory\ProcessFactory;
 use Portrino\Codeception\Interfaces\Commands\ShopwareCommand;
 use Portrino\Codeception\Module\Shopware;
 use Portrino\Codeception\Tests\Module\ShopwareTest;
 use Symfony\Component\Process\Process;
-use Symfony\Component\Process\ProcessBuilder;
+use Symfony\Component\Process\Process;
 
 /**
  * Class ActivatePluginTest
@@ -38,11 +38,11 @@ class ActivatePluginTest extends ShopwareTest
 
         $this->container = $this->prophesize(ModuleContainer::class);
         $this->process = $this->prophesize(Process::class);
-        $this->processBuilderFactory = $this->prophesize(ProcessBuilderFactory::class);
-        $this->builder = $this->prophesize(ProcessBuilder::class);
+        $this->ProcessFactory = $this->prophesize(ProcessFactory::class);
+        $this->builder = $this->prophesize(Process::class);
         $this->asserts = $this->prophesize(Asserts::class);
 
-        $tmpBuilder = new ProcessBuilder();
+        $tmpBuilder = new Process();
         $cmd = $tmpBuilder
             ->setPrefix(self::$shopwareConsolePath)
             ->setArguments(
@@ -75,10 +75,10 @@ class ActivatePluginTest extends ShopwareTest
         $this->process->getOutput()->willReturn(self::DEBUG_SUCCESS);
         $this->asserts->assertTrue(true)->shouldBeCalled();
 
-        $this->processBuilderFactory->getBuilder()->willReturn($this->builder);
+        $this->ProcessFactory->getBuilder()->willReturn($this->builder);
 
         $this->shopware = new Shopware($this->container->reveal());
-        $this->shopware->setProcessBuilderFactory($this->processBuilderFactory->reveal());
+        $this->shopware->setProcessFactory($this->ProcessFactory->reveal());
         $this->shopware->_inject($this->asserts->reveal());
     }
 

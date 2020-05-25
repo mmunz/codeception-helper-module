@@ -3,8 +3,8 @@
 namespace Portrino\Codeception\Module\Traits;
 
 use Codeception\Module\Asserts;
-use Portrino\Codeception\Factory\ProcessBuilderFactory;
-use Symfony\Component\Process\ProcessBuilder;
+use Portrino\Codeception\Factory\ProcessFactory;
+use Symfony\Component\Process\Process;
 
 /**
  * Trait CommandExecutorTrait
@@ -33,16 +33,16 @@ trait CommandExecutorTrait
     protected $asserts;
 
     /**
-     * @var ProcessBuilderFactory
+     * @var ProcessFactory
      */
-    protected $processBuilderFactory;
+    protected $ProcessFactory;
 
     /**
-     * @param ProcessBuilderFactory $processBuilderFactory
+     * @param ProcessFactory $ProcessFactory
      */
-    public function setProcessBuilderFactory($processBuilderFactory)
+    public function setProcessFactory($ProcessFactory)
     {
-        $this->processBuilderFactory = $processBuilderFactory;
+        $this->ProcessFactory = $ProcessFactory;
     }
 
     /**
@@ -52,32 +52,28 @@ trait CommandExecutorTrait
      */
     public function executeCommand($command, $arguments = [], $environmentVariables = [])
     {
-        $builder = $this->processBuilderFactory->getBuilder();
-
-        $builder->setPrefix($this->consolePath);
-
         array_unshift($arguments, $command);
+        array_unshift($arguments, $this->consolePath);
         $arguments = array_map('strval', $arguments);
 
-        $builder->setArguments($arguments);
+        $builder = $this->ProcessFactory->getBuilder($arguments);
         if (count($environmentVariables) > 0) {
             $builder->addEnvironmentVariables($environmentVariables);
         }
-        $process = $builder->getProcess();
 
-        $this->debugSection('Execute', $process->getCommandLine());
+        $this->debugSection('Execute', $builder->getCommandLine());
 
-        $process->setTimeout($this->processTimeout);
-        $process->setIdleTimeout($this->processIdleTimeout);
+        $builder->setTimeout($this->processTimeout);
+        $builder->setIdleTimeout($this->processIdleTimeout);
 
-        $process->run();
+        $builder->run();
 
-        if ($process->isSuccessful()) {
-            $this->debugSection('Success', $process->getOutput());
+        if ($builder->isSuccessful()) {
+            $this->debugSection('Success', $builder->getOutput());
         } else {
-            $this->debugSection('Error', $process->getErrorOutput());
+            $this->debugSection('Error', $builder->getErrorOutput());
         }
 
-        $this->asserts->assertTrue($process->isSuccessful());
+        $this->asserts->assertTrue($builder->isSuccessful());
     }
 }

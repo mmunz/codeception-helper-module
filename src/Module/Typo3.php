@@ -23,7 +23,7 @@ use Composer\Semver\Comparator;
 use Composer\Semver\VersionParser;
 use PackageVersions\Versions;
 use Portrino\Codeception\Exception\MethodNotSupportedException;
-use Portrino\Codeception\Factory\ProcessBuilderFactory;
+use Portrino\Codeception\Factory\ProcessFactory;
 use Portrino\Codeception\Interfaces\Commands\Typo3Command;
 use Portrino\Codeception\Module\Interfaces\CommandExecutorInterface;
 use Portrino\Codeception\Module\Traits\CommandExecutorTrait;
@@ -83,7 +83,7 @@ class Typo3 extends Module implements DependsOnModule, CommandExecutorInterface
         $this->consolePath = sprintf('%s%s', $this->config['bin-dir'], 'typo3cms');
         $this->processTimeout = $this->config['process-timeout'];
         $this->processIdleTimeout = $this->config['process-idle-timeout'];
-        $this->processBuilderFactory = new ProcessBuilderFactory();
+        $this->ProcessFactory = new ProcessFactory();
     }
 
     /**
@@ -126,15 +126,15 @@ class Typo3 extends Module implements DependsOnModule, CommandExecutorInterface
      */
     public function _before(TestInterface $test)
     {
-        $file = vsprintf(
-            '%s/sys_domain/%s.sql',
-            [
-                $this->config['data-dir'],
-                $this->config['domain']
-            ]
-        );
-
-        $this->importIntoDatabase($file);
+//        $file = vsprintf(
+//            '%s/sys_domain/%s.sql',
+//            [
+//                $this->config['data-dir'],
+//                $this->config['domain']
+//            ]
+//        );
+//
+//        $this->importIntoDatabase($file);
     }
 
     /**
@@ -150,18 +150,15 @@ class Typo3 extends Module implements DependsOnModule, CommandExecutorInterface
             throw new MethodNotSupportedException($this, '$I->importIntoDatabase is not supported for "symfony/process" < 2.8');
         }
 
-        $builder = $this->processBuilderFactory->getBuilder();
-        $builder->setPrefix($this->consolePath);
+        $builder = $this->ProcessFactory->getBuilder([$this->consolePath, Typo3Command::DATABASE_IMPORT]);
         $input = new InputStream();
         $sql = file_get_contents($file);
         $input->write($sql);
-        $builder->add(Typo3Command::DATABASE_IMPORT);
         $builder->setInput($input);
-        $process = $builder->getProcess();
-        $this->debugSection('Execute', $process->getCommandLine());
-        $process->start();
+        $this->debugSection('Execute', $builder->getCommandLine());
+        $builder->run();
         $input->close();
-        $process->wait();
+        $builder->wait();
     }
 
     /**
@@ -192,12 +189,16 @@ class Typo3 extends Module implements DependsOnModule, CommandExecutorInterface
      */
     public function flushCache($force = false, $filesOnly = false)
     {
+        $args = [];
+        if ($force) {
+            $args['force'] = true;
+        }
+        if ($filesOnly) {
+            $args['files-only'] = true;
+        }
         $this->executeCommand(
             Typo3Command::CACHE_FLUSH,
-            [
-                'force' => $force,
-                'files-only' => $filesOnly
-            ]
+            $args
         );
     }
 
