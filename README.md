@@ -120,6 +120,14 @@ Import $file into database.
 $I->importIntoDatabase($file)
 ```
 
+#### executeInDatabase
+
+Directly run a sql statement in the database.
+
+```php
+$I->executeInDatabase('SELECT uid from pages where uid=1');
+```
+
 ### Shopware module
 
 ```yml
