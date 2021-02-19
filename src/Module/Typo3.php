@@ -141,13 +141,11 @@ class Typo3 extends Module implements DependsOnModule, CommandExecutorInterface
     public function importIntoDatabase($file)
     {
         $builder = $this->ProcessFactory->getBuilder([$this->consolePath, Typo3Command::DATABASE_IMPORT]);
-        $input = new InputStream();
-        $sql = file_get_contents($file);
-        $input->write($sql);
+        $input = fopen($file, 'w+');
         $builder->setInput($input);
         $this->debugSection('Execute', $builder->getCommandLine());
         $builder->run();
-        $input->close();
+        fclose($input);
         $builder->wait();
     }
 
