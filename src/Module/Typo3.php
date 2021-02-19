@@ -140,14 +140,34 @@ class Typo3 extends Module implements DependsOnModule, CommandExecutorInterface
      */
     public function importIntoDatabase($file)
     {
+        $input = new InputStream();
+        $sql = file_get_contents($file);
         $builder = $this->ProcessFactory->getBuilder([$this->consolePath, Typo3Command::DATABASE_IMPORT]);
-        $input = fopen($file, 'w+');
         $builder->setInput($input);
+        $input->write($sql);
         $this->debugSection('Execute', $builder->getCommandLine());
-        $builder->run();
-        fclose($input);
+        $builder->start();
+        $input->close();
         $builder->wait();
     }
+
+
+    /**
+     * @param string $statement
+     * @throws MethodNotSupportedException
+     */
+    public function executeInDatabase($statement)
+    {
+        $builder = $this->ProcessFactory->getBuilder([$this->consolePath, Typo3Command::DATABASE_IMPORT]);
+        $input = new InputStream();
+        $builder->setInput($input);
+        $input->write($statement);
+        $this->debugSection('Execute', $builder->getCommandLine());
+        $builder->start();
+        $input->close();
+        $builder->wait();
+    }
+
 
     /**
      * execute scheduler task
